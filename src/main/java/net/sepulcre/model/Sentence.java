@@ -7,7 +7,7 @@ public class Sentence {
 	private String runeA, runeB;
 	private final int power;
 	private final String suffixe;
-	private String id;
+	private int id;
 	private EnumState nextState;
 	private int coolDown;
 
@@ -29,7 +29,7 @@ public class Sentence {
 //		return false;
 //	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -64,7 +64,7 @@ public class Sentence {
 		return true;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	

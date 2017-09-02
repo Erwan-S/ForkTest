@@ -26,24 +26,24 @@ public class Main {
 				String line = (String) content[i];
 
 				String[] elements = line.split("\t");
-				
+
 				// Check if this sentence is validated
-				if(!"ok".equalsIgnoreCase(elements.length > 3 ? elements[4].trim() : "")) {
+				if (!"ok".equalsIgnoreCase(elements.length > 3 ? elements[4].trim() : "")) {
 					continue;
 				}
 
 				List<String> runes = Arrays.asList(elements[0].trim().split("\\+"));
 				runes.replaceAll(String::trim);
 				Collections.sort(runes);
-				
+
 				int power = Integer.valueOf(EnumState.getState(elements[1].trim()).getCode());
 
 				Sentence sentence = new Sentence(runes, power);
 
-				String sentenceId = getExistingSentenceId(sentences, sentence);
+				Integer sentenceId = getExistingSentenceId(sentences, sentence);
 				if (sentenceId == null) {
-					int max = getMaxId(sentences);
-					sentenceId = String.format("%02d", ++max);
+					sentenceId = getMaxId(sentences) + 1;
+					// sentenceId = String.format("%02d", ++max);
 				}
 				sentence.setId(sentenceId);
 
@@ -77,10 +77,11 @@ public class Main {
 				writer.print("&" + sentence.getRuneB() + "Rune");
 				writer.println(" };");
 
-				writer.println("#define SEQ_" + i + "_RUNES_SIZE (sizeof(seq" + 1 + "Runes)/sizeof(sItem*))");
+				writer.println("#define SEQ_" + i + "_RUNES_SIZE (sizeof(seq" + i + "Runes)/sizeof(sItem*))");
 
 				writer.println("const sResult seq" + i + "Result = { " + sentence.getNextState().getCode() + ", "
-						+ sentence.getId() + sentence.getSuffixe() + ", true, " + sentence.getCoolDown() + " };");
+						+ (sentence.getPower() * 100 + sentence.getId()) + " /* " + sentence.getSuffixe()
+						+ " */, true, " + sentence.getCoolDown() + " };");
 
 				writer.println("const sSequence seq" + i + "[] = { SEQ_" + i + "_RUNES_SIZE, &seq" + i + "Runes, &seq"
 						+ i + "Result };");
@@ -89,9 +90,10 @@ public class Main {
 
 			for (int i = 0; i < 3; i++) {
 				List<String> availableSentences = availableSentencesByPowerLevel[i];
-				writer.println("const sDirSequence sequencesDir1 = {");
+				writer.println("const sDirSequence sequencesDir" + (i + 1) + " = {");
 				writer.println("\t" + availableSentences.size() + ",");
 				writer.println("\t{");
+				writer.print("\t\t");
 				writer.println(String.join(", ", availableSentences));
 				writer.println("\t}");
 				writer.println("};");
@@ -99,6 +101,9 @@ public class Main {
 
 			}
 
+			writer.println("// Table of sequences by directory");
+			writer.println(
+					"const sDirSequence *seq_dir[NB_DIRECTORY] = { &sequencesDir1, &sequencesDir2, &sequencesDir3 };");
 			writer.close();
 
 		} catch (IOException |
@@ -118,12 +123,12 @@ public class Main {
 	private static int getMaxId(List<Sentence> sentences) {
 		int result = 1;
 		for (Sentence sentence : sentences) {
-			result = Math.max(result, Integer.valueOf(sentence.getId()));
+			result = Math.max(result, sentence.getId());
 		}
 		return result;
 	}
 
-	private static String getExistingSentenceId(List<Sentence> sentences, Sentence newSentence) {
+	private static Integer getExistingSentenceId(List<Sentence> sentences, Sentence newSentence) {
 		for (Sentence sentence : sentences) {
 			if (sentence.equals(newSentence)) {
 				return sentence.getId();
