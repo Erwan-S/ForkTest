@@ -75,7 +75,7 @@ public class Main {
 
 				availableSentencesByPowerLevel[sentence.getPower() - 1].add("&seq" + i);
 
-				writer.print("const sItem *seq" + i + "Runes[] = { ");
+				writer.print("const sItem * const seq" + i + "Runes[] PROGMEM = { ");
 				writer.print("&" + sentence.getRuneA() + "Rune, ");
 				writer.print("&" + sentence.getRuneB() + "Rune");
 				writer.println(" };");
