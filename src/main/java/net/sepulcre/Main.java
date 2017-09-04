@@ -130,7 +130,7 @@ public class Main {
 
 	private static Integer getExistingSentenceId(List<Sentence> sentences, Sentence newSentence) {
 		for (Sentence sentence : sentences) {
-			if (sentence.equals(newSentence)) {
+			if (sentence.isSameRunes(newSentence)) {
 				return sentence.getId();
 			}
 		}

@@ -29,37 +29,16 @@ public class Sentence {
 		this.power = power;
 	}
 
-//	public boolean isSameRunes(Sentence other) {
-//		if ((runeA.equals(other.runeA) && runeB.equals(other.runeB))
-//				|| (runeA.equals(other.runeB) && runeB.equalsIgnoreCase(other.runeA))) {
-//			return true;
-//		}
-//		return false;
-//	}
-
 	public int getId() {
 		return id;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((runeA == null) ? 0 : runeA.hashCode());
-		result = prime * result + ((runeB == null) ? 0 : runeB.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean isSameRunes(Sentence other) {
+		if (this == other)
 			return true;
-		if (obj == null)
+		if (other == null)
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Sentence other = (Sentence) obj;
-		if (runeA == null) {
+ 		if (runeA == null) {
 			if (other.runeA != null)
 				return false;
 		} else if (!runeA.equals(other.runeA))
