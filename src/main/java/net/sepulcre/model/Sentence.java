@@ -12,6 +12,14 @@ public class Sentence {
 	private int coolDown;
 
 	public Sentence(List<String> runes, int power) {
+		if (runes.size() != 2) {
+			StringBuilder message = new StringBuilder("number of runes not handle: ");
+			message.append(runes.size());
+			message.append("(");
+			message.append(String.join(",", runes));
+			message.append(")");
+			throw new IllegalArgumentException(message.toString());
+		}
 		runeA = fromFrenchToVesten(runes.get(0));
 		runeB = fromFrenchToVesten(runes.get(1));
 		suffixe = runeA.substring(0, 3) + runeB.substring(0, 3);

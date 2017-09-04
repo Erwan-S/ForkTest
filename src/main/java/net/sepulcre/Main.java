@@ -2,30 +2,27 @@ package net.sepulcre;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sepulcre.business.GoogleSheetManager;
 import net.sepulcre.model.EnumState;
 import net.sepulcre.model.Sentence;
 
 public class Main {
 
 	public static void main(String[] args) {
-		List<Sentence> sentences = new ArrayList<>();
+		String spreadsheetId = "1OapKxDh5cetydNjXS7r7a5Uq4H-kOvu76Cdnhe3-j7k";
+		String range = "Séquences!A2:G";
+
+		List<List<Object>> content;
 		try {
-			URI uri = Main.class.getResource("/Draft phrases Machine - Séquences.tsv").toURI();
-			Object[] content = (Object[]) Files.lines(Paths.get(uri)).toArray();
-
-			for (int i = 0; i < content.length; i++) {
-				String line = (String) content[i];
-
-				String[] elements = line.split("\t");
+			content = GoogleSheetManager.getValues(spreadsheetId, range);
+			List<Sentence> sentences = new ArrayList<>();
+			for (int i = 0; i < content.size(); i++) {
+				String[] elements = content.get(i).toArray(new String[content.get(i).size()]);
 
 				// Check if this sentence is validated
 				if (!"ok".equalsIgnoreCase(elements.length > 3 ? elements[4].trim() : "")) {
@@ -37,8 +34,14 @@ public class Main {
 				Collections.sort(runes);
 
 				int power = Integer.valueOf(EnumState.getState(elements[1].trim()).getCode());
-
-				Sentence sentence = new Sentence(runes, power);
+				
+				Sentence sentence;
+				try {
+					sentence = new Sentence(runes, power);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					continue;
+				}
 
 				Integer sentenceId = getExistingSentenceId(sentences, sentence);
 				if (sentenceId == null) {
@@ -105,10 +108,7 @@ public class Main {
 			writer.println(
 					"const sDirSequence *seq_dir[NB_DIRECTORY] = { &sequencesDir1, &sequencesDir2, &sequencesDir3 };");
 			writer.close();
-
-		} catch (IOException |
-
-				URISyntaxException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
