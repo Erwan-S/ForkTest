@@ -1,31 +1,31 @@
 package net.sepulcre.model;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+import net.sepulcre.util.RuneConverter;
 
 public class Sentence {
 
-	private String runeA, runeB;
-	private final int power;
+	private List<String> runes = new ArrayList<>();
+	private final EnumState power;
 	private final String suffixe;
 	private int id;
 	private EnumState nextState;
 	private int coolDown;
+	private boolean validated;
 
-	public Sentence(List<String> runes, int power) {
-		if (runes.size() != 2) {
-			StringBuilder message = new StringBuilder("number of runes not handle: ");
-			message.append(runes.size());
-			message.append("(");
-			message.append(String.join(",", runes));
-			message.append(")");
-			throw new IllegalArgumentException(message.toString());
+	public Sentence(List<String> runes, EnumState power) {
+		for(String rune : runes) {
+			this.runes.add(RuneConverter.fromFrenchToVesten(rune));
 		}
-		runeA = fromFrenchToVesten(runes.get(0));
-		runeB = fromFrenchToVesten(runes.get(1));
-		suffixe = runeA.substring(0, 3) + runeB.substring(0, 3);
-		if (power == 0) {
-			throw new IllegalArgumentException(runeA + "/" + runeB + "/" + power);
+		StringBuilder sb = new StringBuilder();
+		for (String rune : this.runes) {
+			sb.append(StringUtils.capitalize(rune));
 		}
+		this.suffixe = sb.toString();
 		this.power = power;
 	}
 
@@ -33,53 +33,25 @@ public class Sentence {
 		return id;
 	}
 
-	public boolean isSameRunes(Sentence other) {
-		if (this == other)
-			return true;
-		if (other == null)
-			return false;
- 		if (runeA == null) {
-			if (other.runeA != null)
-				return false;
-		} else if (!runeA.equals(other.runeA))
-			return false;
-		if (runeB == null) {
-			if (other.runeB != null)
-				return false;
-		} else if (!runeB.equals(other.runeB))
-			return false;
-		return true;
-	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
 	
-	private static String fromFrenchToVesten(String line) {
-		line = line.replaceAll("Intuition", "varsel");
-		line = line.replaceAll("Mélancolie", "stans");
-		line = line.replaceAll("Profondeur", "fjell");
-		line = line.replaceAll("Destruction", "herje");
-		line = line.replaceAll("Destin", "villskap");
-		line = line.replaceAll("Ensemble", "ensomhet");
-		line = line.replaceAll("Orgueil", "storsaed");
-		line = line.replaceAll("Mort", "grenselos");
-		line = line.replaceAll("Changement", "fornuft");
-		line = line.replaceAll("Pouvoir", "styrke");
-		line = line.replaceAll("Impunité", "sterk");
-		line = line.replaceAll("Passion", "nod");
-		line = line.replaceAll("Affrontement", "kjolig");
-		line = line.replaceAll("Orga", "orga");
-
-		return line;
-	}
-	
-	public String getRuneA() {
-		return runeA;
-	}
-
-	public String getRuneB() {
-		return runeB;
+	public boolean isSameRunes(Sentence other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (runes == null) {
+			if (other.runes != null) {
+				return false;
+			}
+		} else if (!runes.equals(other.runes)) {
+			return false;
+		}
+		return true;
 	}
 
 	public void setNexState(EnumState nextState) {
@@ -98,12 +70,58 @@ public class Sentence {
 		this.coolDown = coolDown;
 	}
 
-	public int getPower() {
+	public EnumState getPower() {
 		return power;
 	}
 	
 	public String getSuffixe() {
 		return suffixe;
+	}
+
+	public List<String> getRunes() {
+		return runes;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((power == null) ? 0 : power.hashCode());
+		result = prime * result + ((runes == null) ? 0 : runes.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Sentence other = (Sentence) obj;
+		if (power != other.power) {
+			return false;
+		}
+		if (runes == null) {
+			if (other.runes != null) {
+				return false;
+			}
+		} else if (!runes.equals(other.runes)) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean isValidated() {
+		return validated;
+	}
+
+	public void setValidated(boolean validated) {
+		this.validated = validated;
 	}
 
 }

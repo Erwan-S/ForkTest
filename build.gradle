@@ -1,10 +1,21 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'Quickstart'
+mainClassName = 'Main'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version = '1.0'
+
+sourceSets {
+	main {
+    	java {
+			srcDirs= ["src/main/java"]
+		}
+		resources {
+			srcDirs= ["src/main/resources"]
+		}
+	}
+}
 
 repositories {
     mavenCentral()
@@ -14,6 +25,6 @@ dependencies {
     compile 'com.google.api-client:google-api-client:1.22.0'
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
     compile 'com.google.apis:google-api-services-sheets:v4-rev483-1.22.0'
-    
-    
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
 }

@@ -25,4 +25,7 @@ public enum EnumState {
 		return code;
 	}
 	
+	public String getLabel() {
+		return label;
+	}
 }
