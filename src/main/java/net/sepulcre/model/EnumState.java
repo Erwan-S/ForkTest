@@ -2,7 +2,7 @@ package net.sepulcre.model;
 
 public enum EnumState {
 	
-	KRONIEN ("Kronien", "1"), AETHERIC("Æthérique", "2"), DIVINE("Divin", "3"), NONE("", "END_OF_SEQUENCE_RESTART_ID");
+	KRONIEN ("Kronien", "1"), AETHERIC("Æthérique", "2"), DIVINE("Divin", "3"), NONE("", "END_OF_SEQUENCE_CONTINUE_DIR_ID");
 
 	private final String label;
 	private final String code;
