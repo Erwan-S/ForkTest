@@ -16,6 +16,7 @@ import net.sepulcre.util.RuneConverter;
 public class Main {
 
 	private static final boolean GENERATE_NAME = false;
+	private static final int OTHER_POWER_ID = 0XFF;
 	private static final boolean GENERATE_MP3 = false;
 	private static final boolean RESET_ID = false;
 
@@ -52,7 +53,7 @@ public class Main {
 				}
 
 				String existingId = elements.length > 8 ? elements[8].trim() : null;
-				if (RESET_ID || existingId == null) {
+				if (RESET_ID || existingId == null || Integer.valueOf(existingId.substring(0, 3)) == 255) {
 					sentence.setId(makeSentenceId(sentences, sentence));
 				} else {
 					sentence.setId(Integer.valueOf(existingId.substring(0, 3)));
@@ -64,8 +65,8 @@ public class Main {
 				}
 
 				// Check if this sentence is validated
-				if ("ok".equalsIgnoreCase(elements.length > 4 ? elements[4].trim() : "")) {
-					sentence.setValidated(true);
+				if (elements.length > 2 ? elements[2].trim().isEmpty() : false) {
+					sentence.setValidated(false);
 				}
 
 				EnumState nextState = EnumState.getState(elements.length > 7 ? elements[7].trim() : "");
@@ -73,7 +74,9 @@ public class Main {
 
 				sentences.add(sentence);
 			}
-
+			
+			fixIdForUneffectiveSentences(sentences); 
+			
 			PrintWriter writer = new PrintWriter("config_sequence.c", "UTF-8");
 			initOutputFile(writer);
 
@@ -94,9 +97,9 @@ public class Main {
 					createMp3(sentence);
 				}
 
-//				if (!sentence.isValidated()) {
-//					continue;
-//				}
+				if (!sentence.isValidated()) {
+					continue;
+				}
 				
 				int power = Integer.valueOf(sentence.getPower().getCode());
 				availableSentencesByPowerLevel[power - 1].add("&seq" + i);
@@ -116,8 +119,6 @@ public class Main {
 					writer.print("&" + rune + "Rune");
 				}
 				writer.println(" } };");
-				// + "SEQ_" + i + "_RUNES_SIZE, &seq" + i + "Runes, &seq"
-				// + i + "Result };");
 				writer.println();
 
 			}
@@ -133,6 +134,28 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private static void fixIdForUneffectiveSentences(List<Sentence> sentences) {
+		for (int i = 0; i < sentences.size(); ++i) {
+			Sentence sentence = sentences.get(i);
+			if (!sentence.isValidated()) {
+				for (int j = 0; j < sentences.size(); ++j) {
+					Sentence otherSentence = sentences.get(j);
+					if (sentence.isSameRunes(otherSentence) && otherSentence.isValidated()) {
+						sentence.setId(OTHER_POWER_ID);
+						break;
+					}
+				}
+			}
+		}
+		//validate sentence with id fixed
+		for (Sentence sentence : sentences) {
+			if (sentence.getId() == OTHER_POWER_ID) {
+				sentence.setValidated(true);
+			}
+		}
+		
 	}
 
 	private static void addSequencesDir(PrintWriter writer, List<String>[] availableSentencesByPowerLevel) {

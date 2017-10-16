@@ -15,7 +15,7 @@ public class Sentence {
 	private int id;
 	private EnumState nextState;
 	private int coolDown;
-	private boolean validated;
+	private boolean validated = true;
 
 	public Sentence(List<String> runes, EnumState power) {
 		for(String rune : runes) {
